@@ -13,7 +13,7 @@ public partial class Alojamiento
 
     public string? Descripcion { get; set; }
 
-    public int IdUsuario { get; set; }
+    public int Id_Usuario { get; set; }
 
     public virtual Usuario IdUsuarioNavigation { get; set; } = null!;
 

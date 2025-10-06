@@ -35,14 +35,14 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("descripcion");
-            entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
+            entity.Property(e => e.Id_Usuario).HasColumnName("id_usuario");
             entity.Property(e => e.Ubicacion)
                 .HasMaxLength(200)
                 .IsUnicode(false)
                 .HasColumnName("ubicacion");
 
             entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Alojamientos)
-                .HasForeignKey(d => d.IdUsuario)
+                .HasForeignKey(d => d.Id_Usuario)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Alojamien__id_us__34C8D9D1");
         });
