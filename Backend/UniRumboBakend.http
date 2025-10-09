@@ -1,0 +1,26 @@
+@UniRumboBakend_HostAddress = http://localhost:5163
+
+GET {{UniRumboBakend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+
+### Crear Ruta (ejemplo)
+POST http://localhost:5163/api/rutas
+Content-Type: application/json
+
+{
+	"PuntoOrigen": "Bogota",
+	"PuntoDestino": "Cali",
+	"HoraSalida": "2025-10-05T10:00:00Z",
+	"HoraRegreso": null,
+	"CuposIda": 1,
+	"CuposVuelta": null,
+	"IdUsuario": 2,
+	"IdVehiculo": 1,
+	"OrigenLat": 4.711,
+	"OrigenLon": -74.0721,
+	"DestinoLat": 3.4372,
+	"DestinoLon": -76.5225
+}
+
+###
