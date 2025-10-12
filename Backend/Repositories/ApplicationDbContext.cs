@@ -44,11 +44,11 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
             entity.Property(e => e.IdVehiculo).HasColumnName("id_vehiculo");
 
-            // Coordenadas persistidas en BD (añadir columnas si aún no existen)
-            entity.Property(e => e.OrigenLat).HasColumnName("origen_lat");
-            entity.Property(e => e.OrigenLon).HasColumnName("origen_lon");
-            entity.Property(e => e.DestinoLat).HasColumnName("destino_lat");
-            entity.Property(e => e.DestinoLon).HasColumnName("destino_lon");
+            // Si la tabla no tiene columnas de coordenadas, ignora estas propiedades para evitar errores.
+            entity.Ignore(e => e.OrigenLat);
+            entity.Ignore(e => e.OrigenLon);
+            entity.Ignore(e => e.DestinoLat);
+            entity.Ignore(e => e.DestinoLon);
         });
 
             // ============================

@@ -10,13 +10,9 @@ namespace UniRumbo.Backend.Controllers;
 public class RutasController : ControllerBase
 {
   private readonly IRutasService _svc;
-  private readonly IHttpClientFactory _http;
-  public RutasController(IRutasService svc, IHttpClientFactory http) { _svc = svc; _http = http; }
+  public RutasController(IRutasService svc) { _svc = svc; }
 
-  /// <summary>Buscar rutas por origen/destino/fecha</summary>
-  [HttpGet]
-  public async Task<ActionResult<IEnumerable<RutaListDto>>> Buscar([FromQuery] string? origen, [FromQuery] string? destino, [FromQuery] DateTime? fecha)
-    => Ok(await _svc.BuscarAsync(origen, destino, fecha));
+  // Eliminado: listado público. Nos quedamos con Crear, Editar, Mis Rutas y Detalle.
 
   /// <summary>Crear una nueva ruta</summary>
   [HttpPost]
@@ -33,6 +29,19 @@ public class RutasController : ControllerBase
     }
   }
 
+  /// <summary>Editar una ruta</summary>
+  [HttpPut]
+  public async Task<ActionResult> Editar([FromBody] EditarRutaDto dto)
+  {
+    var ok = await _svc.EditarAsync(dto);
+    return ok ? NoContent() : NotFound();
+  }
+
+  /// <summary>Listar solo mis rutas</summary>
+  [HttpGet("mias/{usuarioId:int}")]
+  public async Task<ActionResult<IEnumerable<RutaListDto>>> Mias(int usuarioId)
+    => Ok(await _svc.ObtenerMiasAsync(usuarioId));
+
   /// <summary>Detalle de una ruta</summary>
   [HttpGet("{id:int}")]
   public async Task<ActionResult<RutaListDto>> GetById(int id)
@@ -41,11 +50,5 @@ public class RutasController : ControllerBase
     return r is null ? NotFound() : Ok(r);
   }
 
-  /// <summary>GeoJSON del recorrido (línea + marcadores)</summary>
-  [HttpGet("{id:int}/geo")]
-  public async Task<ActionResult<object>> Geo(int id)
-  {
-    var fc = await _svc.GeoAsync(id, _http);
-    return fc is null ? NotFound("Esta ruta no tiene coordenadas.") : Ok(fc);
-  }
+  // Eliminado endpoint de GeoJSON: fuera de alcance actual.
 }

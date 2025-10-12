@@ -9,10 +9,8 @@ export default function Navbar({ persona = "Cliente", nombre = "Nombre" }){
       <div className="nav-inner">
         <div className="brand">UniRumbo</div>
         <div className="tabs">
-          <Link className={`tab ${is('/')?'active':''}`} to="/">Rutas</Link>
-          <Link className={`tab ${is('/mis-rutas')?'active':''}`} to="/mis-rutas">Mis Rutas</Link>
+          <Link className={`tab ${is('/mis-rutas')||is('/')?'active':''}`} to="/mis-rutas">Mis Rutas</Link>
           <Link className={`tab ${is('/rutas/crear')?'active':''}`} to="/rutas/crear">Crear Ruta</Link>
-          <Link className={`tab ${is('/solicitudes')?'active':''}`} to="/solicitudes">Solicitudes</Link>
         </div>
         <div style={{marginLeft:"auto", color:"#475569"}}>Nombre {persona}</div>
       </div>

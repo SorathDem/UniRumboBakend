@@ -33,6 +33,31 @@ public class RutasService : Interfaces.IRutasService
     return r is null ? null : Proj(r, r.Vehiculo?.TipoVehiculo == true ? "Moto" : "Carro");
   }
 
+  public async Task<IEnumerable<RutaListDto>> ObtenerMiasAsync(int usuarioId)
+  {
+    var list = await _db.Rutas.Include(x=>x.Vehiculo).Where(r => r.IdUsuario == usuarioId)
+      .OrderByDescending(r=>r.HoraSalida).ToListAsync();
+    return list.Select(r => Proj(r, r.Vehiculo?.TipoVehiculo == true ? "Moto" : "Carro"));
+  }
+
+  public async Task<bool> EditarAsync(EditarRutaDto dto)
+  {
+    var r = await _db.Rutas.FirstOrDefaultAsync(x => x.IdRuta == dto.IdRuta);
+    if (r is null) return false;
+    r.PuntoOrigen = dto.PuntoOrigen;
+    r.PuntoDestino = dto.PuntoDestino;
+    r.HoraSalida = dto.HoraSalida;
+    r.HoraRegreso = dto.HoraRegreso;
+    r.CuposIda = dto.CuposIda;
+    r.CuposVuelta = dto.CuposVuelta;
+    r.IdUsuario = dto.IdUsuario;
+    r.IdVehiculo = dto.IdVehiculo;
+    r.OrigenLat = dto.OrigenLat; r.OrigenLon = dto.OrigenLon;
+    r.DestinoLat = dto.DestinoLat; r.DestinoLon = dto.DestinoLon;
+    await _db.SaveChangesAsync();
+    return true;
+  }
+
   // Usa OSRM público para obtener la geometría (GeoJSON)
   public async Task<object?> GeoAsync(int id, IHttpClientFactory http)
   {
