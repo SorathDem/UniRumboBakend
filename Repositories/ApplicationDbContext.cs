@@ -10,17 +10,41 @@ public partial class ApplicationDbContext : DbContext
     }
 
     public virtual DbSet<Alojamiento> Alojamiento { get; set; }
+    public DbSet<Rutum> Rutas { get; set; }
     public virtual DbSet<Estado> Estados { get; set; }
     public virtual DbSet<Rol> Rol { get; set; }
-    public virtual DbSet<Rutum> Ruta { get; set; }
     public virtual DbSet<Sede> Sede { get; set; }
-    public virtual DbSet<SolicitudAlojamiento> SolicitudAlojamientos { get; set; }
-    public virtual DbSet<SolicitudRutum> SolicitudRuta { get; set; }
     public virtual DbSet<Usuario> Usuario { get; set; }
     public virtual DbSet<Vehiculo> Vehiculos { get; set; }
+    public DbSet<SolicitudRutum> SolicitudRuta { get; set; }
+    public DbSet<SolicitudAlojamiento> SolicitudAlojamiento { get; set; }
+    public DbSet<Estado> Estado { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Rutum>(entity =>
+        {
+            entity.HasKey(e => e.IdRuta);
+
+            entity.ToTable("Ruta");
+            // ... Tu código de mapeo de columnas existente ...
+            entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
+            entity.Property(e => e.IdVehiculo).HasColumnName("id_vehiculo");
+
+            // 1. Relación con Usuario
+            entity.HasOne(r => r.Usuario)
+                  .WithMany(u => u.Ruta)
+                  .HasForeignKey(r => r.IdUsuario)
+                  .IsRequired();
+
+            entity.HasOne(r => r.Vehiculo) // Propiedad de Navegación en Rutum
+                                           // DEBES APUNTAR A LA PROPIEDAD 'Rutas' EN LA ENTIDAD VEHICULO
+                      .WithMany(v => v.Rutas)
+                      .HasForeignKey(r => r.IdVehiculo) // Usa la propiedad IdVehiculo como FK
+                      .IsRequired();
+        });
+
         // ============================
         // Tabla Alojamiento
         // ============================
@@ -35,14 +59,14 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("descripcion");
-            entity.Property(e => e.Id_Usuario).HasColumnName("id_usuario");
+            entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
             entity.Property(e => e.Ubicacion)
                 .HasMaxLength(200)
                 .IsUnicode(false)
                 .HasColumnName("ubicacion");
 
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Alojamientos)
-                .HasForeignKey(d => d.Id_Usuario)
+            entity.HasOne(d => d.Usuario).WithMany(p => p.Alojamientos)
+                .HasForeignKey(d => d.IdUsuario)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Alojamien__id_us__34C8D9D1");
         });
@@ -113,6 +137,25 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("descripcion");
         });
 
+        modelBuilder.Entity<Estado>(entity =>
+        {
+            entity.HasKey(e => e.IdEstado).HasName("PK__Estado__...");
+            entity.ToTable("Estado");
+
+            entity.Property(e => e.IdEstado).HasColumnName("id_estado");
+
+            // 👇 importante: mapea tu propiedad Estado1 a la columna "estado"
+            entity.Property(e => e.EstadoNombre)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("estado");
+
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("descripcion");
+        });
+
         // ============================
         // Tabla Sede
         // ============================
@@ -131,6 +174,8 @@ public partial class ApplicationDbContext : DbContext
 
         OnModelCreatingPartial(modelBuilder);
     }
+
+
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

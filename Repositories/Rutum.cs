@@ -1,33 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using UniRumbo.Repositories;
+// Asegúrate de tener el using para el atributo Key si IdRuta es tu PK
+// Si estás usando EF Core, no necesitas el using UniRumbo.Repositories
 
-namespace UniRumbo.Repositories;
-
-public partial class Rutum
+[Table("Ruta")]
+public class Rutum
 {
-    [Key]
+    // Propiedad de Clave Primaria (PK)
+    [Column("id_ruta")]
     public int IdRuta { get; set; }
 
+    // --- Otras propiedades de la ruta (se mantienen igual) ---
+    [Column("punto_origen")]
     public string PuntoOrigen { get; set; } = null!;
 
+    [Column("punto_destino")]
     public string PuntoDestino { get; set; } = null!;
 
+    [Column("hora_salida")]
     public DateTime HoraSalida { get; set; }
 
-    public DateTime? HoraRegreso { get; set; }
+    [Column("hora_regreso")]
+    public DateTime HoraRegreso { get; set; }
+    [Column("descripcion_vechivulo")]
+    public string? DesVehiculo { get; set; }
 
+    [Column("cupos_ida")]
     public int CuposIda { get; set; }
 
-    public int? CuposVuelta { get; set; }
+    [Column("cupos_vuelta")]
+    public int CuposVuelta { get; set; }
 
+    [Column("id_usuario")]
     public int IdUsuario { get; set; }
 
+    [Column("id_vehiculo")]
     public int IdVehiculo { get; set; }
 
-    public virtual Usuario IdUsuarioNavigation { get; set; } = null!;
+    [Column("dias_ruta")]
+    public string? DiasRuta { get; set; }
 
-    public virtual Vehiculo IdVehiculoNavigation { get; set; } = null!;
+    // --- Propiedades de Navegación (Relaciones) ---
 
-    public virtual ICollection<SolicitudRutum> SolicitudRuta { get; set; } = new List<SolicitudRutum>();
+    // 1. Relación con Usuario:
+    // [ForeignKey] debe apuntar al nombre de la *propiedad CLR* (IdUsuario).
+    public Usuario Usuario { get; set; } = null!;
+    public Vehiculo Vehiculo { get; set; } = null!;
 }

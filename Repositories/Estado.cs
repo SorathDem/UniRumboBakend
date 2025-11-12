@@ -1,19 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace UniRumbo.Repositories;
-
-public partial class Estado
+namespace UniRumbo.Repositories
 {
-    [Key]
-    public int IdEstado { get; set; }
+    [Table("Estado")]
+    public partial class Estado
+    {
+        [Key]
+        [Column("id_estado")]
+        public int IdEstado { get; set; }
 
-    public string Estado1 { get; set; } = null!;
+        [Column("estado")]
+        public string EstadoNombre { get; set; } = null!;
 
-    public string? Descripcion { get; set; }
+        [Column("descripcion")]
+        public string Descripcion { get; set; } = null!;
 
-    public virtual ICollection<SolicitudAlojamiento> SolicitudAlojamientos { get; set; } = new List<SolicitudAlojamiento>();
-
-    public virtual ICollection<SolicitudRutum> SolicitudRuta { get; set; } = new List<SolicitudRutum>();
+        // 🔹 Relaciones inversas
+        public virtual ICollection<SolicitudRutum> SolicitudRuta { get; set; } = new List<SolicitudRutum>();
+        public virtual ICollection<SolicitudAlojamiento> SolicitudAlojamiento { get; set; } = new List<SolicitudAlojamiento>();
+    }
 }

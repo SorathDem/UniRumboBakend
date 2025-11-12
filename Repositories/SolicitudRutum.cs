@@ -1,23 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace UniRumbo.Repositories;
-
-public partial class SolicitudRutum
+namespace UniRumbo.Repositories
 {
-    [Key]
-    public int IdSoliRuta { get; set; }
+    [Table("Solicitud_ruta")]
+    public partial class SolicitudRutum
+    {
+        [Key]
+        [Column("id_SoliRuta")]
+        public int IdSoliRuta { get; set; }
 
-    public int IdEstado { get; set; }
+        [Column("id_estado")]
+        public int IdEstado { get; set; }
 
-    public int IdUsuario { get; set; }
+        [Column("id_usuario")]
+        public int IdUsuario { get; set; }
 
-    public int IdRuta { get; set; }
+        [Column("id_ruta")]
+        public int IdRuta { get; set; }
 
-    public virtual Estado IdEstadoNavigation { get; set; } = null!;
+        // 🔹 Relaciones
+        [ForeignKey("IdEstado")]
+        public virtual Estado Estado { get; set; } = null!;
 
-    public virtual Rutum IdRutaNavigation { get; set; } = null!;
+        [ForeignKey("IdUsuario")]
+        public virtual Usuario Usuario { get; set; } = null!;
 
-    public virtual Usuario IdUsuarioNavigation { get; set; } = null!;
+        [ForeignKey("IdRuta")]
+        public virtual Rutum Ruta { get; set; } = null!;
+    }
 }

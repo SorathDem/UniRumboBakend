@@ -1,36 +1,89 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using UniRumbo.Dtos;
+using UniRumbo.Repositories;
+using UniRumboBakend.Controllers;
+using UniRumboBakend.Dtos;
 
-namespace UniRumbo.Dtos
+namespace UniRumbo.Services
 {
-    public class AlojamientoDto
+    public class AlojamientoService
     {
-        public int IdAlojamiento { get; set; }
-        public string Ubicacion { get; set; } = null!;
-        public string? Descripcion { get; set; }
-        public int Id_Usuario { get; set; }
-    }
+        private readonly AlojamientoRepository _repository;
 
-    // ✅ DTO para crear
-    public class AlojamientoCreateDto
-    {
-        [Required(ErrorMessage = "La ubicación es obligatoria.")]
-        public string Ubicacion { get; set; } = null!;
+        public AlojamientoService(AlojamientoRepository repository)
+        {
+            _repository = repository;
+        }
 
-        public string? Descripcion { get; set; }
+        // ✅ Listar todos
+        public async Task<List<AlojamientoDto>> GetAllAsync()
+        {
+            var alojamientos = await _repository.GetAllAsync();
+            return alojamientos.Select(a => new AlojamientoDto
+            {
+                IdAlojamiento = a.IdAlojamiento,
+                Ubicacion = a.Ubicacion,
+                Descripcion = a.Descripcion,
+                Id_Usuario = a.IdUsuario,
+                Direccion = a.Direccion,
+                Titulo = a.Titulo
+            }).ToList();
+        }
 
-        [Required(ErrorMessage = "Debe especificar el ID del usuario.")]
-        public int Id_Usuario { get; set; }
-    }
+        // ✅ Obtener por ID
+        public async Task<AlojamientoDto?> GetByIdAsync(int id)
+        {
+            var a = await _repository.GetByIdAsync(id);
+            if (a == null) return null;
 
-    // ✅ DTO para actualizar
-    public class AlojamientoUpdateDto
-    {
-        [Required(ErrorMessage = "La ubicación es obligatoria.")]
-        public string Ubicacion { get; set; } = null!;
+            return new AlojamientoDto
+            {
+                IdAlojamiento = a.IdAlojamiento,
+                Ubicacion = a.Ubicacion,
+                Descripcion = a.Descripcion,
+                Id_Usuario = a.IdUsuario,
+                Direccion = a.Direccion,
+                Titulo =a.Titulo
+            };
+        }
 
-        public string? Descripcion { get; set; }
+        // ✅ Crear
+        public async Task AddAsync(AlojamientoCreateDto dto)
+        {
+            var alojamiento = new Alojamiento
+            {
+                Ubicacion = dto.Ubicacion,
+                Descripcion = dto.Descripcion,
+                IdUsuario = dto.Id_Usuario,
+                Direccion = dto.Direccion,
+                Titulo = dto.Titulo
+            };
 
-        [Required(ErrorMessage = "Debe especificar el ID del usuario.")]
-        public int Id_Usuario { get; set; }
+            await _repository.AddAsync(alojamiento);
+        }
+
+        // ✅ Actualizar
+        public async Task<bool> UpdateAsync(int id, AlojamientoEditDto dto)
+        {
+            var alojamiento = await _repository.GetByIdAsync(id);
+            if (alojamiento == null) return false;
+
+            
+            alojamiento.Descripcion = dto.Descripcion;
+            alojamiento.Direccion = dto.Direccion;
+            alojamiento.Titulo = dto.Titulo;
+
+            await _repository.UpdateAsync(alojamiento);
+            return true;
+        }
+
+        // ✅ Eliminar
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var alojamiento = await _repository.GetByIdAsync(id);
+            if (alojamiento == null) return false;
+
+            await _repository.DeleteAsync(alojamiento);
+            return true;
+        }
     }
 }

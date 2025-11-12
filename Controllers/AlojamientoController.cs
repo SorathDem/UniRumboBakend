@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using UniRumbo.Repositories;
 using System.Web;
+using UniRumbo.Repositories;
+using UniRumbo.Services;
+using UniRumboBakend.Dtos;
 
 namespace UniRumboBakend.Controllers
 {
@@ -11,7 +13,7 @@ namespace UniRumboBakend.Controllers
     public class AlojamientoController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
-        private readonly string _googleMapsApiKey = "TU_API_KEY"; // 🔑 coloca tu clave real de Google Maps aquí
+        private readonly string _googleMapsApiKey = "AIzaSyCCdUNE22w7v-BO8h9HZmcQuP1iz6jlOfA"; // 🔑 coloca tu clave real de Google Maps aquí
 
         public AlojamientoController(ApplicationDbContext context)
         {
@@ -23,7 +25,8 @@ namespace UniRumboBakend.Controllers
         public async Task<IActionResult> GetAll()
         {
             var alojamientos = await _db.Alojamiento
-                .Include(a => a.IdUsuarioNavigation)
+                .Include(a => a.Usuario)
+                .Include(a => a.Imagenes)
                 .ToListAsync();
 
             var result = alojamientos.Select(a => new
@@ -31,8 +34,13 @@ namespace UniRumboBakend.Controllers
                 a.IdAlojamiento,
                 a.Ubicacion,
                 a.Descripcion,
-                a.Id_Usuario,
-                NombreUsuario = a.IdUsuarioNavigation?.Nombre,
+                a.Direccion,
+                a.Titulo,
+                a.IdUsuario,
+                NombreUsuario = a.Usuario?.Nombre,
+                Imagenes = a.Imagenes
+             .Where(i => i.Img != null)
+             .Select(i => Convert.ToBase64String(i.Img)),
                 GoogleMapsUrl = GenerateMapsEmbedUrlFromUbicacion(a.Ubicacion)
             });
 
@@ -44,7 +52,8 @@ namespace UniRumboBakend.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var a = await _db.Alojamiento
-                .Include(x => x.IdUsuarioNavigation)
+                .Include(x => x.Usuario)
+                .Include(x => x.Imagenes)
                 .FirstOrDefaultAsync(x => x.IdAlojamiento == id);
 
             if (a == null)
@@ -55,8 +64,13 @@ namespace UniRumboBakend.Controllers
                 a.IdAlojamiento,
                 a.Ubicacion,
                 a.Descripcion,
-                a.Id_Usuario,
-                NombreUsuario = a.IdUsuarioNavigation?.Nombre,
+                a.Direccion,
+                a.Titulo,
+                a.IdUsuario,
+                NombreUsuario = a.Usuario?.Nombre,
+                Imagenes = a.Imagenes
+             .Where(i => i.Img != null)
+             .Select(i => Convert.ToBase64String(i.Img)),
                 GoogleMapsUrl = GenerateMapsEmbedUrlFromUbicacion(a.Ubicacion)
             });
         }
@@ -68,13 +82,23 @@ namespace UniRumboBakend.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            // Usa un usuario por defecto si no se envía ninguno
+            int usuarioId = dto.Id_Usuario != 0 ? dto.Id_Usuario : 1;
+
+            // Verifica que el usuario exista
+            var usuario = await _db.Usuario.FindAsync(usuarioId);
+            if (usuario == null)
+                return BadRequest("El usuario especificado no existe.");
+
             string ubicacionString = $"lat:{dto.Latitud},lon:{dto.Longitud}";
 
             var alojamiento = new Alojamiento
             {
                 Ubicacion = ubicacionString,
                 Descripcion = dto.Descripcion,
-                Id_Usuario = dto.Id_Usuario
+                Direccion = dto.Direccion,
+                Titulo = dto.Titulo,
+                IdUsuario = usuarioId
             };
 
             await _db.Alojamiento.AddAsync(alojamiento);
@@ -88,24 +112,50 @@ namespace UniRumboBakend.Controllers
             });
         }
 
+
         // ✅ 4️⃣ EDITAR / ACTUALIZAR ALOJAMIENTO
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] AlojamientoUpdateDto dto)
+        public async Task<IActionResult> Update(int id, [FromBody] AlojamientoEditDto dto)
         {
             var alojamiento = await _db.Alojamiento.FindAsync(id);
             if (alojamiento == null)
                 return NotFound(new { message = "Alojamiento no encontrado." });
 
-            // Si el cliente envía nuevas coordenadas, se actualiza la ubicación
-            if (dto.Latitud != 0 && dto.Longitud != 0)
-                alojamiento.Ubicacion = $"lat:{dto.Latitud},lon:{dto.Longitud}";
-
+            // Solo actualizar los campos editables
+            alojamiento.Titulo = dto.Titulo ?? alojamiento.Titulo;
+            alojamiento.Direccion = dto.Direccion ?? alojamiento.Direccion;
             alojamiento.Descripcion = dto.Descripcion ?? alojamiento.Descripcion;
 
             _db.Entry(alojamiento).State = EntityState.Modified;
             await _db.SaveChangesAsync();
 
             return Ok(new { message = "✅ Alojamiento actualizado correctamente." });
+        }
+
+
+
+        [HttpPost("con-imagenes")]
+        public async Task<IActionResult> CreateWithImages([FromBody] AlojamientoWithImagesDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var alojamiento = new Alojamiento
+            {
+                Ubicacion = $"lat:{dto.Latitud},lon:{dto.Longitud}",
+                Descripcion = dto.Descripcion,
+                IdUsuario = dto.Id_Usuario,
+                Direccion = dto.Direccion,
+                Titulo = dto.Titulo,
+                Imagenes = dto.ImagenesBase64.Select(base64 => new Imagenes
+                {
+                    Img = Convert.FromBase64String(base64)
+                }).ToList()
+            };
+
+            await _db.Alojamiento.AddAsync(alojamiento);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { message = "✅ Alojamiento creado con imágenes correctamente." });
         }
 
         // ✅ 5️⃣ ELIMINAR ALOJAMIENTO
@@ -126,15 +176,14 @@ namespace UniRumboBakend.Controllers
         private string GenerateMapsEmbedUrl(double lat, double lon)
         {
             string q = $"{lat},{lon}";
-            string encoded = HttpUtility.UrlEncode(q);
-            return $"https://www.google.com/maps/embed/v1/place?key={_googleMapsApiKey}&q={encoded}";
+            return $"https://www.google.com/maps/embed/v1/place?key={_googleMapsApiKey}&q={q}&zoom=15";
         }
+
 
         private string GenerateMapsEmbedUrlFromUbicacion(string ubicacion)
         {
             try
             {
-                // Extrae lat/lon del texto: "lat:4.7,lon:-74.0"
                 var partes = ubicacion.Replace("lat:", "").Replace("lon:", "").Split(',');
                 double lat = double.Parse(partes[0]);
                 double lon = double.Parse(partes[1]);
@@ -142,9 +191,10 @@ namespace UniRumboBakend.Controllers
             }
             catch
             {
-                return "";
+                return null;
             }
         }
+
     }
 
     // 🧾 DTOs
@@ -154,6 +204,8 @@ namespace UniRumboBakend.Controllers
         public double Latitud { get; set; }
         public double Longitud { get; set; }
         public int Id_Usuario { get; set; }
+        public string? Direccion { get; set; }
+        public string? Titulo { get; set; }
     }
 
     public class AlojamientoUpdateDto
@@ -161,5 +213,9 @@ namespace UniRumboBakend.Controllers
         public string? Descripcion { get; set; }
         public double Latitud { get; set; }
         public double Longitud { get; set; }
+        public int IdUsuario { get; internal set; }
+        public string Ubicacion { get; internal set; }
+        public string? Direccion { get; set; }
+        public string? Titulo { get; set; }
     }
 }

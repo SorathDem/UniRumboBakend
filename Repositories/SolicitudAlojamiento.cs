@@ -1,23 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace UniRumbo.Repositories;
-
-public partial class SolicitudAlojamiento
+namespace UniRumbo.Repositories
 {
-    [Key]
-    public int IdSoliAlojamiento { get; set; }
+    [Table("Solicitud_alojamiento")]
+    public partial class SolicitudAlojamiento
+    {
+        [Key]
+        [Column("id_SoliAlojamiento")]
+        public int IdSoliAlojamiento { get; set; }
 
-    public int IdAlojamiento { get; set; }
+        [Column("id_alojamiento")]
+        public int IdAlojamiento { get; set; }
 
-    public int IdEstado { get; set; }
+        [Column("id_estado")]
+        public int IdEstado { get; set; }
 
-    public int IdUsuario { get; set; }
+        [Column("id_usuario")]
+        public int IdUsuario { get; set; }
 
-    public virtual Alojamiento IdAlojamientoNavigation { get; set; } = null!;
+        // 🔹 Relaciones
+        [ForeignKey("IdEstado")]
+        public virtual Estado Estado { get; set; } = null!;
 
-    public virtual Estado IdEstadoNavigation { get; set; } = null!;
+        [ForeignKey("IdUsuario")]
+        public virtual Usuario Usuario { get; set; } = null!;
 
-    public virtual Usuario IdUsuarioNavigation { get; set; } = null!;
+        [ForeignKey("IdAlojamiento")]
+        public virtual Alojamiento Alojamiento { get; set; } = null!;
+    }
 }
