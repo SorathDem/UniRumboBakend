@@ -15,14 +15,14 @@ namespace UniRumbo.Repositories
         public async Task<List<Alojamiento>> GetAllAsync()
         {
             return await _context.Alojamiento
-                .Include(a => a.IdUsuarioNavigation)
+                .Include(a => a.Usuario)
                 .ToListAsync();
         }
 
         public async Task<Alojamiento?> GetByIdAsync(int id)
         {
             return await _context.Alojamiento
-                .Include(a => a.IdUsuarioNavigation)
+                .Include(a => a.Usuario)
                 .FirstOrDefaultAsync(a => a.IdAlojamiento == id);
         }
 

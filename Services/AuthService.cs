@@ -20,9 +20,9 @@ namespace UniRumbo.Services
             Console.WriteLine($"DTO id_sede recibido: {dto.id_sede}");
 
             // ⚡ Validación de correo según rol
-            if ((dto.id_rol == 1 || dto.id_rol == 2) && !dto.Correo.EndsWith("@unirumbo.edu"))
+            if ((dto.id_rol == 1 || dto.id_rol == 2) && !dto.Correo.EndsWith("@ucundinamarca.edu.co"))
             {
-                throw new Exception("Los usuarios y conductores deben registrarse con correo institucional (@unirumbo.edu)");
+                throw new Exception("Los usuarios y conductores deben registrarse con correo institucional (@ucundinamarca.edu.co)");
             }
 
             // ⚡ Validación: correo único
