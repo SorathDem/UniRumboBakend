@@ -25,7 +25,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3000") // Puertos del frontend
+        policy.WithOrigins("http://localhost:5173", "http://localhost:3000" , "https://frontunirumbo.onrender.com") // Puertos del frontend
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials(); // ✅ Permitir envío de cookies o headers de autorización
