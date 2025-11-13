@@ -20,7 +20,7 @@ builder.Services.AddControllers()
     });
 
 
-// === CONFIGURAR CORS ===
+// === CONFIGURAR CORS ===//
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
