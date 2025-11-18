@@ -32,6 +32,10 @@ public partial class Usuario
 
     [JsonPropertyName("id_sede")]
     public int IdSede { get; set; }
+    [Column("reset_token")]
+    public string? ResetToken { get; set; }
+    [Column("reset_token_expires_at")]
+    public DateTime? ResetTokenExpires { get; set; }
 
     public virtual ICollection<Alojamiento> Alojamientos { get; set; } = new List<Alojamiento>();
 
