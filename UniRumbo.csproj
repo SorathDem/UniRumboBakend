@@ -7,6 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+
 		<!-- Entity Framework Core -->
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
@@ -18,14 +19,15 @@
 		<!-- JWT Authentication -->
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
 
-
+		<!-- Swagger / OpenAPI -->
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 
-	
+		<!-- Cifrado con BCrypt -->
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 
-		
+		<!-- Generación de PDFs -->
 		<PackageReference Include="QuestPDF" Version="2024.3.2" />
+
 	</ItemGroup>
 
 </Project>
