@@ -4,6 +4,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>UniRumboBakend</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -16,8 +17,9 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3" />
-		<PackageReference Include="SendGrid" Version="9.29.3" />
+
+		<!-- ESTO ES LO IMPORTANTE: Sube la versión o quítalo para que use la correcta automáticamente -->
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.0" />
 	</ItemGroup>
 
 </Project>
