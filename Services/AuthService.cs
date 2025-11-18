@@ -81,7 +81,7 @@ namespace UniRumbo.Services
             var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.Correo == dto.Correo);
             if (usuario == null || !BCrypt.Net.BCrypt.Verify(dto.Contrasena, usuario.Contrasena))
             {
-                return null; // Login inválido
+                return null; // Login inválido si no se reconoce las credenciales
             }
 
             // Generar el token JWT

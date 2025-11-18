@@ -33,7 +33,7 @@ namespace UniRumbo.Controllers
             }
         }
 
-        [HttpPost("login")]
+        [HttpPost("login")] //Comunicacion con el Login y el inicio de sesion
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             var response = await _authService.LoginAsync(dto);
