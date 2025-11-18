@@ -100,7 +100,7 @@ namespace UniRumbo.Services
             return new LoginResponseDto
             {
                 Token = token,
-                //User = userResponse // Si solo quieres el token, pon User = null
+                User = userResponse // Si solo quieres el token, pon User = null
             };
         }
 
