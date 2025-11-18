@@ -3,7 +3,7 @@ using UniRumbo.Dtos;
 using UniRumbo.Repositories;
 using UniRumbo.Services.Interfaces;
 using UniRumboBakend.Dtos;
-
+//Servicio de Solicitudes para rutas y alojamientos, se encarga de la logica de negocio
 namespace UniRumbo.Services
 {
     public class SolicitudesService : ISolicitudesService

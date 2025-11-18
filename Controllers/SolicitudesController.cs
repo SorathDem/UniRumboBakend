@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UniRumbo.Dtos;
 using UniRumbo.Repositories;
 using UniRumbo.Services.Interfaces;
-
+//Controlador de Solicitudes para rutas y alojamientos
 namespace UniRumbo.Controllers
 {
     [ApiController]
