@@ -32,3 +32,46 @@ a{color:inherit;text-decoration:none}
 .empty{padding:40px;color:var(--muted)}
 .mapWrap{background:#fff;border-radius:20px;box-shadow:var(--shadow);padding:12px}
 .footer-actions{display:flex;gap:10px;margin-top:12px}
+
+/* Estilos para Reportes PDF */
+.reportes-container{max-width:900px;margin:0 auto;padding:30px 20px}
+.reportes-header{text-align:center;margin-bottom:40px}
+.reportes-header h1{font-size:36px;font-weight:800;color:#111827;margin:0 0 10px}
+.reportes-header p{color:var(--muted);font-size:16px}
+
+.tabs-container{display:flex;gap:12px;justify-content:center;margin-bottom:30px;border-bottom:2px solid #e5e7eb;padding-bottom:0}
+.tab{padding:12px 28px;border:none;background:transparent;cursor:pointer;font-size:16px;font-weight:600;color:#6b7280;border-bottom:3px solid transparent;transition:all 0.2s}
+.tab:hover{color:#111827;background:#f3f4f6}
+.tab-active{color:#0ea5e9;border-bottom-color:#0ea5e9}
+
+.tab-content{animation:fadeIn 0.3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.reporte-card{background:#fff;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.1);padding:40px;max-width:700px;margin:0 auto}
+.reporte-icon{font-size:64px;text-align:center;margin-bottom:20px}
+.reporte-card h2{font-size:28px;font-weight:700;color:#111827;margin:0 0 12px;text-align:center}
+.reporte-descripcion{color:#6b7280;font-size:15px;line-height:1.6;margin-bottom:30px;text-align:center}
+
+.reporte-features{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:30px}
+.feature-item{display:flex;align-items:center;gap:10px;padding:12px;background:#f8fafc;border-radius:12px;font-size:14px;color:#334155}
+.feature-icon{font-size:20px}
+
+.reporte-form{margin-top:30px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-weight:600;color:#111827;margin-bottom:8px;font-size:14px}
+.input-usuario{width:100%;padding:14px;border:2px solid #e5e7eb;border-radius:12px;font-size:15px;transition:border-color 0.2s}
+.input-usuario:focus{outline:none;border-color:#0ea5e9}
+.input-usuario:disabled{background:#f3f4f6;cursor:not-allowed}
+
+.btn-generar-pdf{width:100%;padding:16px;background:linear-gradient(135deg,#3b82f6,#0ea5e9);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 12px rgba(14,165,233,0.3)}
+.btn-generar-pdf:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(14,165,233,0.4)}
+.btn-generar-pdf:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.btn-generar-pdf.alojamientos{background:linear-gradient(135deg,#10b981,#059669)}
+.btn-generar-pdf.alojamientos:hover:not(:disabled){box-shadow:0 8px 20px rgba(16,185,129,0.4)}
+
+.mensaje{margin-top:20px;padding:14px;border-radius:12px;font-size:14px;font-weight:600;text-align:center;animation:slideIn 0.3s}
+@keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.mensaje-exito{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
+.mensaje-error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.mensaje-advertencia{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+

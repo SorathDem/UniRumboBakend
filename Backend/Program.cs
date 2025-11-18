@@ -35,6 +35,9 @@ builder.Services.AddHttpClient(); // para OSRM/Nominatim
 builder.Services.AddScoped<IRutasService, RutasService>();
 builder.Services.AddScoped<ISolicitudesRutaService, SolicitudesRutaService>();
 
+// 👇 Servicio de reportes PDF
+builder.Services.AddScoped<IReportesService, ReportesService>();
+
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

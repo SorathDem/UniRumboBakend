@@ -11,6 +11,7 @@ export default function Navbar({ persona = "Cliente", nombre = "Nombre" }){
         <div className="tabs">
           <Link className={`tab ${is('/mis-rutas')||is('/')?'active':''}`} to="/mis-rutas">Mis Rutas</Link>
           <Link className={`tab ${is('/rutas/crear')?'active':''}`} to="/rutas/crear">Crear Ruta</Link>
+          <Link className={`tab ${is('/reportes')?'active':''}`} to="/reportes">📊 Reportes</Link>
         </div>
         <div style={{marginLeft:"auto", color:"#475569"}}>Nombre {persona}</div>
       </div>
