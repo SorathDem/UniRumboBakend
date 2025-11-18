@@ -1,17 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Data;
-using Microsoft.Data.SqlClient;
+using System.Text;
 using System.Text.Json.Serialization;
+using UniRumbo.Repositories;
 using UniRumbo.Services;
 using UniRumbo.Services.Interfaces;
-using UniRumbo.Repositories;
+using UniRumboBakend.Services;
+using UniRumboBakend.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // === CONTROLADORES ===
 builder.Services.AddControllers()
-    // 👇 Esto le dice al runtime que también cargue los controladores del ensamblado UniRumbo.Controllers
     .AddApplicationPart(typeof(UniRumbo.Controllers.ReportesController).Assembly)
     .AddJsonOptions(options =>
     {
@@ -19,17 +23,39 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true;
     });
 
-
-// === CONFIGURAR CORS ===//
+// === CONFIGURAR CORS ===
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3000" , "https://frontunirumbo.onrender.com") // Puertos del frontend
+        policy.WithOrigins("http://localhost:5173", "http://localhost:3000", "https://frontunirumbo.onrender.com")
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // ✅ Permitir envío de cookies o headers de autorización
+              .AllowCredentials();
     });
+});
+
+// === CONFIGURAR JWT ===
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
 });
 
 // === Entity Framework (DbContext) ===
@@ -37,7 +63,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("UniRumboDb")));
 
 // === Conexión para Dapper ===
-// ⚠️ Este bloque es lo que faltaba: registra IDbConnection para los servicios como RutasService
 builder.Services.AddScoped<IDbConnection>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
@@ -50,15 +75,38 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<AlojamientoRepository>();
 builder.Services.AddScoped<AlojamientoService>();
-
 builder.Services.AddScoped<IRutasService, RutasService>();
 builder.Services.AddScoped<ISolicitudesService, SolicitudesService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // === Swagger ===
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "UniRumbo API", Version = "v1" });
+    // Soporte para JWT en Swagger
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Ingresa el token JWT con formato: Bearer {token}",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
 });
 
 // === PIPELINE ===
@@ -76,12 +124,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// ✅ CORS debe ir antes de Authorization
-app.UseCors("AllowReactApp");
+app.UseCors("AllowReactApp");        // AQUÍ, ANTES DE Authentication
 
+app.UseAuthentication();             // Importante: después de CORS
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 app.Run();

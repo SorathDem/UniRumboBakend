@@ -8,5 +8,6 @@
         public string Correo { get; set; } = string.Empty;
         public int id_rol { get; set; }
         public int IdSede { get; set; }
+        public string Token { get; set; }
     }
 }
