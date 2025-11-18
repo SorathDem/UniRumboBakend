@@ -123,12 +123,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseCors("AllowReactApp");        // AQUÍ, ANTES DE Authentication
-
-app.UseAuthentication();             // Importante: después de CORS
+app.UseCors("AllowReactApp");
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
