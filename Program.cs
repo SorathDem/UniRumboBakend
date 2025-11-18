@@ -24,14 +24,19 @@ builder.Services.AddControllers()
     });
 
 // === CONFIGURAR CORS ===
+// === CONFIGURAR CORS CORRECTO PARA PRODUCCIÓN ===
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3000", "https://frontunirumbo.onrender.com")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy.WithOrigins(
+                "http://localhost:5173",
+                "http://localhost:3000",
+                "https://frontunirumbo.onrender.com"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // ← ¡IMPORTANTE! Sin esto falla en producción
     });
 });
 
