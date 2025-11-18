@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using UniRumbo.Dtos; // Para UserResponseDto
 using UniRumbo.Repositories;
 using UniRumboBakend.Dtos;
-
+//Controlador de Usuarios para gestionar operaciones CRUD, sirve para administrar la informacion de los usuarios
 namespace UniRumbo.Controllers
 {
     [Route("api/[controller]")]

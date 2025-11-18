@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+//Entidad Estado que representa los diferentes estados de las solicitudes
 namespace UniRumbo.Repositories
 {
     [Table("Estado")]
